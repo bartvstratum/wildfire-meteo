@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Wildfire meteo analysis tool</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+    </head>
+
+    <body>
+
+        <header>🌳 Wildfire meteo analysis tool 🔥</header>
+        <main>
+            <aside class="sidebar left">
+                <h3>Settings</h3>
+                <label>
+                    Latitude
+                    <input type="text" placeholder="52.0">
+                </label>
+                <label>
+                    Longitude
+                    <input type="text" placeholder="6">
+                </label>
+                <label>
+                    Surface temperature
+                    <input type="range" min="-10" max="45" value="20">
+                </label>
+                <label>
+                    Surface humidity
+                    <input type="range" min="-10" max="45" value="20">
+                </label>
+                <label>
+                    Fire area
+                    <input type="range" min="-10" max="45" value="20">
+                </label>
+            </aside>
+
+            <section class="plot">
+                <svg id="skewt" style="width:100%;height:100%;display:block;"></svg>
+            </section>
+
+            <aside class="sidebar right">
+                <h3>Sounding data</h3>
+                <button>Fetch model data</button>
+                <button>Fetch nearest sounding</button>
+                <button>Upload sounding</button>
+            </aside>
+        </main>
+
+        <script>
+            (function () {
+                const svg = d3.select("#skewt");
+                const margin = { top: 20, right: 20, bottom: 55, left: 60 };
+
+                function draw() {
+                    svg.selectAll("*").remove();
+
+                    const W = svg.node().clientWidth  - margin.left - margin.right;
+                    const H = svg.node().clientHeight - margin.top  - margin.bottom;
+                    if (W <= 0 || H <= 0) return;
+
+                    const x = d3.scaleLinear().domain([-40, 40]).range([0, W]);
+                    const y = d3.scaleLog().domain([1013, 100]).range([H, 0]);
+
+                    const g = svg.append("g")
+                        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                    g.append("rect")
+                        .attr("width", W).attr("height", H)
+                        .attr("fill", "white").attr("stroke", "#ccc");
+
+                    g.append("g").call(d3.axisLeft(y)
+                        .tickValues([1000, 850, 700, 500, 400, 300, 200, 100])
+                        .tickFormat(d => d))
+                        .selectAll("text").style("font-size", "14px");
+
+                    g.append("g")
+                        .attr("transform", `translate(0,${H})`)
+                        .call(d3.axisBottom(x).ticks(8).tickFormat(d => d + "°"))
+                        .selectAll("text").style("font-size", "14px");
+
+                    g.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("x", -H / 2).attr("y", -42)
+                        .attr("text-anchor", "middle")
+                        .style("font-size", "14px")
+                        .text("Pressure (hPa)");
+
+                    g.append("text")
+                        .attr("x", W / 2).attr("y", H + 38)
+                        .attr("text-anchor", "middle")
+                        .style("font-size", "14px")
+                        .text("Temperature (°C)");
+                }
+
+                draw();
+                window.addEventListener("resize", draw);
+            })();
+        </script>
+
+    </body>
+</html>

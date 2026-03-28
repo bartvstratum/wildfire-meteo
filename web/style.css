@@ -1,0 +1,115 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Roboto, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    color: #222;
+}
+
+header {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #212733;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    padding: 1rem;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sidebar.right {
+    border-right: none;
+    border-left: 1px solid #ddd;
+}
+
+.sidebar h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #888;
+}
+
+.sidebar label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.sidebar input[type="text"] {
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.sidebar button {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.sidebar button:hover {
+    background: #f0f0f0;
+}
+
+.plot {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    min-width: 0;
+    padding: 1rem;
+}
+
+/* stack on narrow screens */
+@media (max-width: 900px) {
+    main {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .sidebar.right {
+        border-left: none;
+        border-top: 1px solid #ddd;
+        border-bottom: none;
+    }
+
+    .plot {
+        min-height: 400px;
+    }
+}
