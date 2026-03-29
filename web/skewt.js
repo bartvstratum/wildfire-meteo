@@ -85,11 +85,24 @@
             const td_pts = sounding_data.Td.map((t, i) => [t, sounding_data.p_hpa[i]]);
 
             function draw_profile(pts, color) {
-                chart.append("path").datum(pts)
+                const path = chart.append("path").datum(pts)
                     .attr("fill", "none")
                     .attr("stroke", color)
                     .attr("stroke-width", 2.5)
                     .attr("d", line);
+
+                const drag = d3.drag()
+                    .on("start", function () {
+                        d3.select(this).style("cursor", "grabbing");
+                    })
+                    .on("drag", function (event, d) {
+                        d[0] = x.invert(event.x);
+                        d3.select(this).attr("cx", x(d[0]));
+                        path.attr("d", line);
+                    })
+                    .on("end", function () {
+                        d3.select(this).style("cursor", "grab");
+                    });
 
                 chart.selectAll(null).data(pts).enter()
                     .append("circle")
@@ -99,7 +112,8 @@
                     .attr("fill", "white")
                     .attr("stroke", color)
                     .attr("stroke-width", 2)
-                    .style("cursor", "grab");
+                    .style("cursor", "grab")
+                    .call(drag);
             }
 
             draw_profile(t_pts,  "#e0333c");
