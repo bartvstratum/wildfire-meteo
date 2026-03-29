@@ -1,29 +1,27 @@
 from pathlib import Path
 
-import numpy as np
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from skewT import SkewT_lines
+from skewT import get_static_lines
 
 app = FastAPI()
 
-# Cache background lines at startup (they never change).
-_stl = SkewT_lines()
-_stl.calc()
+# Cache at startup — background lines never change.
+_lines = get_static_lines(skew_factor=35, ktot=64)
 
 
 @app.get("/api/background")
 def background():
     return {
-        "skew_factor":    _stl.skew_factor,
-        "p1":             _stl.p1_lin.tolist(),
-        "p2":             _stl.p2.tolist(),
-        "p2_lin":         _stl.p2_lin.tolist(),
-        "isotherms":      _stl.isotherms.T.tolist(),
-        "dry_adiabats":   _stl.dry_adiabats.T.tolist(),
-        "moist_adiabats": _stl.moist_adiabats.T.tolist(),
-        "isohumes":       _stl.isohumes.T.tolist(),
+        "p_isotherms":    _lines["p_isotherms"].tolist(),
+        "p_dry":          _lines["p_dry"].tolist(),
+        "p_moist":        _lines["p_moist"].tolist(),
+        "p_isohumes":     _lines["p_isohumes"].tolist(),
+        "isotherms":      _lines["isotherms"].T.tolist(),
+        "dry_adiabats":   _lines["dry_adiabats"].T.tolist(),
+        "moist_adiabats": _lines["moist_adiabats"].T.tolist(),
+        "isohumes":       _lines["isohumes"].T.tolist(),
     }
 
 

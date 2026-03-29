@@ -1,6 +1,27 @@
 (function () {
     const svg = d3.select("#skewt");
-    const margin = { top: 20, right: 20, bottom: 55, left: 60 };
+    const margin = { top: 30, right: 30, bottom: 65, left: 70 };
+    let bgData = null;
+
+    fetch("/api/background")
+        .then(r => r.json())
+        .then(data => { bgData = data; draw(); });
+
+    function drawLines(chart, x, y, temps, pressures_pa, color) {
+        const p_hpa = pressures_pa.map(p => p / 100);
+        const lineGen = d3.line()
+            .x((T, i) => x(T))
+            .y((T, i) => y(p_hpa[i]));
+        temps.forEach(line => {
+            chart.append("path")
+                .datum(line)
+                .attr("fill", "none")
+                .attr("stroke", color)
+                .attr("stroke-width", 1)
+                .attr("stroke-dasharray", "4,2")
+                .attr("d", lineGen);
+        });
+    }
 
     function draw() {
         svg.selectAll("*").remove();
@@ -9,7 +30,7 @@
         const H = svg.node().clientHeight - margin.top  - margin.bottom;
         if (W <= 0 || H <= 0) return;
 
-        const x = d3.scaleLinear().domain([-40, 40]).range([0, W]);
+        const x = d3.scaleLinear().domain([-40, 50]).range([0, W]);
         const y = d3.scaleLog().domain([1013, 100]).range([H, 0]);
 
         const g = svg.append("g")
@@ -18,6 +39,18 @@
         g.append("rect")
             .attr("width", W).attr("height", H)
             .attr("fill", "white").attr("stroke", "#ccc");
+
+        // Clip path so background lines don't overflow the plot area.
+        g.append("clipPath").attr("id", "skewt-clip")
+            .append("rect").attr("width", W).attr("height", H);
+
+        if (bgData) {
+            const chart = g.append("g").attr("clip-path", "url(#skewt-clip)");
+            drawLines(chart, x, y, bgData.isotherms,      bgData.p_isotherms, "rgba(179,179,179,0.7)");
+            drawLines(chart, x, y, bgData.isohumes,       bgData.p_isohumes,  "rgba(31,119,180,0.7)");
+            drawLines(chart, x, y, bgData.dry_adiabats,   bgData.p_dry,       "rgba(214,39,40,0.7)");
+            drawLines(chart, x, y, bgData.moist_adiabats, bgData.p_moist,     "rgba(179,179,179,0.7)");
+        }
 
         g.append("g").call(d3.axisLeft(y)
             .tickValues([1000, 850, 700, 500, 400, 300, 200, 100])
