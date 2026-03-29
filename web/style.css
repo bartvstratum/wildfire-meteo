@@ -84,6 +84,41 @@ main {
     color: #555;
 }
 
+.sidebar label:has(input[type="checkbox"]) {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar select {
+    padding: 0.5rem 0.65rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    width: 100%;
+    background: #fff;
+    cursor: pointer;
+}
+
+.sidebar select:disabled {
+    background: #f5f5f5;
+    color: #aaa;
+    cursor: default;
+}
+
+.sidebar button:disabled {
+    background: #ccc;
+    cursor: default;
+}
+
+.sidebar input[type="file"] {
+    font-size: 0.875rem;
+    font-family: inherit;
+    width: 100%;
+    cursor: pointer;
+}
+
 .sidebar input[type="text"],
 .sidebar input[type="date"] {
     padding: 0.5rem 0.65rem;

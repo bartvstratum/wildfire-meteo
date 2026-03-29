@@ -54,9 +54,53 @@
                     </div>
                 </details>
 
-                <details class="section" open>
-                    <summary><span class="material-icons">local_fire_department</span> Fire settings</summary>
+                <details class="section">
+                    <summary><span class="material-icons">local_fire_department</span> Wildfire cases</summary>
                     <div class="section-body">
+                        <label>
+                            Case
+                            <select id="case_select">
+                                <option value="">— select a case —</option>
+                                <option value="Batea|2024-05-11|41.14588|0.26582">Batea</option>
+                                <option value="Drunen|2025-04-12|51.671205|5.106621">Drunen</option>
+                                <option value="Ede|2025-04-03|52.060754|5.715939">Ede</option>
+                                <option value="El Valle 2|2025-02-10|-38.367708|-72.748855">El Valle 2</option>
+                                <option value="Etos|2025-07-03|38.100084|23.967836">Etos</option>
+                                <option value="Granyena|2025-06-21|41.626751|1.236477">Granyena</option>
+                                <option value="Guissona|2025-07-01|41.831381|1.249456">Guissona</option>
+                                <option value="Junquillos|2025-02-10|-36.395926|-71.539974">Junquillos</option>
+                                <option value="Katsimidi|2024-06-29|38.183321|23.791808">Katsimidi</option>
+                                <option value="La Capellania|2025-02-03|-34.104316|-71.571216">La Capellanía</option>
+                                <option value="La Figuera|2024-07-28|41.214060|0.741027">La Figuera</option>
+                                <option value="Lavrio|2025-08-08|37.776629|23.998869">Lavrio</option>
+                                <option value="Manuel Rodriguez|2025-02-05|-33.132803|-70.952737">Manuel Rodríguez</option>
+                                <option value="Martorell|2021-07-13|41.46442|1.936534">Martorell</option>
+                                <option value="Mequinensa|2024-07-07|41.379853|0.315670">Mequinensa</option>
+                                <option value="Orista|2023-10-05|41.902943|2.052567">Oristà</option>
+                                <option value="Patagual|2025-02-08|-36.683683|-71.949610">Patagual</option>
+                                <option value="Pauls|2025-07-07|40.918279|0.419517">Paüls</option>
+                                <option value="Pont de Vilomara|2022-07-07|41.686460|1.901683">Pont de Vilomara</option>
+                                <option value="Rojals|2024-03-21|41.363944|1.113958">Rojals</option>
+                                <option value="San Patricio|2025-02-14|-36.818355|-71.586075">San Patricio</option>
+                                <option value="Santa Coloma 1|2021-07-24|41.52329|1.369071">Santa Coloma 1</option>
+                                <option value="Santa Coloma 2|2021-07-25|41.52329|1.369071">Santa Coloma 2</option>
+                                <option value="Thimari|2025-06-26|37.696382|23.945007">Thimari</option>
+                                <option value="Tortosa|2024-05-28|40.823570|0.593460">Tortosa</option>
+                                <option value="Varnavas|2024-08-11|38.237959|23.924421">Varnavas</option>
+                                <option value="Vega Honda|2025-02-06|-36.791327|-71.980379">Vega Honda</option>
+                                <option value="Vilanova da Meia|2024-08-09|41.947036|1.072223">Vilanova da Meia</option>
+                            </select>
+                        </label>
+                    </div>
+                </details>
+
+                <details class="section">
+                    <summary><span class="material-icons">local_fire_department</span> Parcel control</summary>
+                    <div class="section-body">
+                        <label>
+                            Launch parcel
+                            <input type="checkbox" id="launch_parcel">
+                        </label>
                         <label>
                             Surface temperature
                             <input type="range" min="-10" max="45" value="20">
@@ -78,10 +122,53 @@
             </section>
 
             <aside class="sidebar right">
-                <h3>Sounding data</h3>
-                <button>Fetch model data</button>
-                <button>Fetch nearest sounding</button>
-                <button>Upload sounding</button>
+                <details class="section" open>
+                    <summary><span class="material-icons">cloud_download</span> Weather model</summary>
+                    <div class="section-body">
+                        <label>
+                            Model
+                            <select id="model_select">
+                                <option value="best_match">Best match</option>
+                                <option value="ecmwf_ifs025">ECMWF IFS 9 km</option>
+                                <option value="ecmwf_aifs025_single">ECMWF AIFS</option>
+                                <option value="icon_seamless">DWD ICON seamless</option>
+                                <option value="metno_seamless">MET Nordic</option>
+                                <option value="gfs_seamless">NOAA GFS seamless</option>
+                                <option value="gem_seamless">CWS GEM seamless</option>
+                                <option value="meteofrance_seamless">MeteoFrance seamless</option>
+                                <option value="ukmo_seamless">UKMO seamless</option>
+                            </select>
+                        </label>
+                        <button>
+                            <span class="material-icons">download</span> Fetch model data
+                        </button>
+                    </div>
+                </details>
+
+                <details class="section">
+                    <summary><span class="material-icons">sensors</span> Radiosonde</summary>
+                    <div class="section-body">
+                        <label>
+                            Nearest station
+                            <select id="station_select" disabled>
+                                <option value="">— select location first —</option>
+                            </select>
+                        </label>
+                        <button disabled>
+                            <span class="material-icons">download</span> Fetch sounding
+                        </button>
+                    </div>
+                </details>
+
+                <details class="section">
+                    <summary><span class="material-icons">upload_file</span> Upload sounding</summary>
+                    <div class="section-body">
+                        <label>
+                            Sounding file
+                            <input type="file" id="sounding_upload" accept=".txt,.csv">
+                        </label>
+                    </div>
+                </details>
             </aside>
         </main>
 
