@@ -18,11 +18,17 @@
 (function () {
     const svg = d3.select("#skewt");
     const margin = { top: 30, right: 30, bottom: 65, left: 70 };
-    let bgData = null;
+    let bg_data = null;
+    let sounding_data = null;
 
-    fetch("/api/background")
-        .then(r => r.json())
-        .then(data => { bgData = data; draw(); });
+    Promise.all([
+        fetch("/api/background").then(r => r.json()),
+        fetch("/api/sounding").then(r => r.json()),
+    ]).then(([bg, snd]) => {
+        bg_data = bg;
+        sounding_data = snd;
+        draw();
+    });
 
     function drawLines(chart, x, y, temps, pressures_pa, color) {
         const p_hpa = pressures_pa.map(p => p / 100);
@@ -61,12 +67,43 @@
         g.append("clipPath").attr("id", "skewt-clip")
             .append("rect").attr("width", W).attr("height", H);
 
-        if (bgData) {
-            const chart = g.append("g").attr("clip-path", "url(#skewt-clip)");
-            drawLines(chart, x, y, bgData.isotherms,      bgData.p_isotherms, "rgba(179,179,179,0.7)");
-            drawLines(chart, x, y, bgData.isohumes,       bgData.p_isohumes,  "rgba(31,119,180,0.7)");
-            drawLines(chart, x, y, bgData.dry_adiabats,   bgData.p_dry,       "rgba(214,39,40,0.7)");
-            drawLines(chart, x, y, bgData.moist_adiabats, bgData.p_moist,     "rgba(179,179,179,0.7)");
+        const chart = g.append("g").attr("clip-path", "url(#skewt-clip)");
+
+        if (bg_data) {
+            drawLines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
+            drawLines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");
+            drawLines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
+            drawLines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
+        }
+
+        if (sounding_data) {
+            const line = d3.line()
+                .x(d => x(d[0]))
+                .y(d => y(d[1]));
+
+            const t_pts  = sounding_data.T.map( (t, i) => [t, sounding_data.p_hpa[i]]);
+            const td_pts = sounding_data.Td.map((t, i) => [t, sounding_data.p_hpa[i]]);
+
+            function draw_profile(pts, color) {
+                chart.append("path").datum(pts)
+                    .attr("fill", "none")
+                    .attr("stroke", color)
+                    .attr("stroke-width", 2.5)
+                    .attr("d", line);
+
+                chart.selectAll(null).data(pts).enter()
+                    .append("circle")
+                    .attr("cx", d => x(d[0]))
+                    .attr("cy", d => y(d[1]))
+                    .attr("r", 5)
+                    .attr("fill", "white")
+                    .attr("stroke", color)
+                    .attr("stroke-width", 2)
+                    .style("cursor", "grab");
+            }
+
+            draw_profile(t_pts,  "#e0333c");
+            draw_profile(td_pts, "#2a7ec8");
         }
 
         g.append("g").call(d3.axisLeft(y)
