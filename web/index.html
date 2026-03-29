@@ -23,36 +23,54 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Wildfire meteo analysis tool</title>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="style.css">
         <script src="https://d3js.org/d3.v7.min.js"></script>
     </head>
 
     <body>
 
-        <header>🌳 Wildfire meteo analysis tool 🔥</header>
+        <header>Wildfire meteo analysis tool</header>
         <main>
             <aside class="sidebar left">
-                <h3>Settings</h3>
-                <label>
-                    Latitude
-                    <input type="text" placeholder="52.0">
-                </label>
-                <label>
-                    Longitude
-                    <input type="text" placeholder="6">
-                </label>
-                <label>
-                    Surface temperature
-                    <input type="range" min="-10" max="45" value="20">
-                </label>
-                <label>
-                    Surface humidity
-                    <input type="range" min="-10" max="45" value="20">
-                </label>
-                <label>
-                    Fire area
-                    <input type="range" min="-10" max="45" value="20">
-                </label>
+                <details class="section" open>
+                    <summary><span class="material-icons">public</span> Location &amp; date</summary>
+                    <div class="section-body">
+                        <label>
+                            Latitude
+                            <input type="text" placeholder="52.0">
+                        </label>
+                        <label>
+                            Longitude
+                            <input type="text" placeholder="6">
+                        </label>
+                        <label>
+                            Date
+                            <input type="date" value="2026-03-29">
+                        </label>
+                        <button>
+                            <span class="material-icons">my_location</span> Here and now
+                        </button>
+                    </div>
+                </details>
+
+                <details class="section" open>
+                    <summary><span class="material-icons">local_fire_department</span> Fire settings</summary>
+                    <div class="section-body">
+                        <label>
+                            Surface temperature
+                            <input type="range" min="-10" max="45" value="20">
+                        </label>
+                        <label>
+                            Surface humidity
+                            <input type="range" min="-10" max="45" value="20">
+                        </label>
+                        <label>
+                            Fire area
+                            <input type="range" min="-10" max="45" value="20">
+                        </label>
+                    </div>
+                </details>
             </aside>
 
             <section class="plot">
