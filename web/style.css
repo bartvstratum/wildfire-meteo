@@ -20,12 +20,18 @@ header {
     color: #212733;
     background: #fff;
     border-bottom: 1px solid #ddd;
+    max-width: 1600px;
+    width: 100%;
+    align-self: center;
 }
 
 main {
     flex: 1;
     display: flex;
     min-height: 0;
+    max-width: 1600px;
+    width: 100%;
+    align-self: center;
 }
 
 .sidebar {
