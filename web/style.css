@@ -15,6 +15,19 @@
  * limitations under the License.
  */
 
+:root {
+    --color-accent:      #ff4b4b;
+    --color-accent-dark: #e03030;
+    --color-bg:          #f5f5f5;
+    --color-surface:     #fff;
+    --color-border:      #ddd;
+    --color-border-mid:  #ccc;
+    --color-text:        #222;
+    --color-text-muted:  #555;
+    --color-text-faint:  #888;
+    --color-text-dim:    #aaa;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -26,17 +39,17 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #f5f5f5;
-    color: #222;
+    background: var(--color-bg);
+    color: var(--color-text);
 }
 
 header {
     padding: 0.75rem 1.5rem;
     font-weight: 600;
     font-size: 1.5rem;
-    color: #ff4b4b;
-    background: #fff;
-    border-bottom: 1px solid #ddd;
+    color: var(--color-accent);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
     max-width: 1600px;
     width: 100%;
     align-self: center;
@@ -55,8 +68,8 @@ main {
     width: 280px;
     flex-shrink: 0;
     padding: 1.25rem;
-    background: #fff;
-    border-right: 1px solid #ddd;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -65,7 +78,7 @@ main {
 
 .sidebar.right {
     border-right: none;
-    border-left: 1px solid #ddd;
+    border-left: 1px solid var(--color-border);
 }
 
 .sidebar h3 {
@@ -73,7 +86,7 @@ main {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #888;
+    color: var(--color-text-faint);
 }
 
 .sidebar label {
@@ -81,7 +94,7 @@ main {
     flex-direction: column;
     gap: 0.4rem;
     font-size: 0.875rem;
-    color: #555;
+    color: var(--color-text-muted);
 }
 
 .sidebar label:has(input[type="checkbox"]) {
@@ -92,23 +105,23 @@ main {
 
 .sidebar select {
     padding: 0.5rem 0.65rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border-mid);
     border-radius: 4px;
     font-size: 0.875rem;
     font-family: inherit;
     width: 100%;
-    background: #fff;
+    background: var(--color-surface);
     cursor: pointer;
 }
 
 .sidebar select:disabled {
-    background: #f5f5f5;
-    color: #aaa;
+    background: var(--color-bg);
+    color: var(--color-text-dim);
     cursor: default;
 }
 
 .sidebar button:disabled {
-    background: #ccc;
+    background: var(--color-border-mid);
     cursor: default;
 }
 
@@ -122,7 +135,7 @@ main {
 .sidebar input[type="text"],
 .sidebar input[type="date"] {
     padding: 0.5rem 0.65rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border-mid);
     border-radius: 4px;
     font-size: 0.875rem;
     font-family: inherit;
@@ -135,7 +148,7 @@ main {
     width: 100%;
     height: 4px;
     border-radius: 2px;
-    background: #ddd;
+    background: var(--color-border);
     outline: none;
     cursor: pointer;
 }
@@ -145,7 +158,7 @@ main {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #ff4b4b;
+    background: var(--color-accent);
     cursor: pointer;
     transition: transform 0.1s;
 }
@@ -159,12 +172,12 @@ main {
     height: 16px;
     border: none;
     border-radius: 50%;
-    background: #ff4b4b;
+    background: var(--color-accent);
     cursor: pointer;
 }
 
 .sidebar input[type="range"]::-moz-range-progress {
-    background: #ff4b4b;
+    background: var(--color-accent);
     height: 4px;
     border-radius: 2px;
 }
@@ -178,8 +191,8 @@ main {
     padding: 0.55rem 0.75rem;
     border: none;
     border-radius: 4px;
-    background: #ff4b4b;
-    color: #fff;
+    background: var(--color-accent);
+    color: var(--color-surface);
     font-size: 0.85rem;
     font-weight: 600;
     font-family: inherit;
@@ -188,7 +201,7 @@ main {
 }
 
 .sidebar button:hover {
-    background: #e03030;
+    background: var(--color-accent-dark);
 }
 
 .sidebar button .material-icons {
@@ -197,9 +210,9 @@ main {
 
 /* ── Collapsible sections ────────────────────────────── */
 .section {
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 6px;
-    background: #fff;
+    background: var(--color-surface);
     overflow: hidden;
 }
 
@@ -226,7 +239,7 @@ main {
     content: '▾';
     margin-left: auto;
     font-size: 0.75rem;
-    color: #888;
+    color: var(--color-text-faint);
     transition: transform 0.15s;
 }
 
@@ -239,7 +252,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--color-border);
 }
 
 .plot {
@@ -247,7 +260,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: white;
+    background: var(--color-surface);
     min-width: 0;
     padding: 1rem;
     position: relative;
@@ -265,8 +278,8 @@ main {
 .spinner {
     width: 48px;
     height: 48px;
-    border: 5px solid #ddd;
-    border-top-color: #ff4b4b;
+    border: 5px solid var(--color-border);
+    border-top-color: var(--color-accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -288,7 +301,7 @@ main {
 
 .sidebar-divider {
     border: none;
-    border-top: 1px solid #ff4b4b;
+    border-top: 1px solid var(--color-accent);
     margin: 0;
 }
 
@@ -301,12 +314,12 @@ main {
     .sidebar {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--color-border);
     }
 
     .sidebar.right {
         border-left: none;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid var(--color-border);
         border-bottom: none;
     }
 
