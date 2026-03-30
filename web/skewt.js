@@ -21,12 +21,55 @@
     let bg_data = null;
     let sounding_data = null;
 
+    let model_data = null;
+    let current_time = 0;
+
     Promise.all([
         fetch("/api/background").then(r => r.json()),
         fetch("/api/sounding").then(r => r.json()),
     ]).then(([bg, snd]) => {
         bg_data = bg;
         sounding_data = snd;
+        draw();
+    });
+
+    document.getElementById("fetch_model_btn").addEventListener("click", () => {
+        const lat   = document.getElementById("lat_input").value;
+        const lon   = document.getElementById("lon_input").value;
+        const date  = document.getElementById("date_input").value;
+        const model = document.getElementById("model_select").value;
+
+        if (!lat || !lon || !date) return;
+
+        const url = `/api/model_sounding?lat=${lat}&lon=${lon}&model=${model}&date=${date}`;
+        fetch(url).then(r => r.json()).then(data => {
+            model_data = data;
+            current_time = 0;
+
+            const slider = document.getElementById("time_slider");
+            slider.max = data.times.length - 1;
+            slider.value = 0;
+            document.getElementById("time_label").textContent = data.times[0] + " UTC";
+            document.getElementById("time_section").style.display = "";
+
+            sounding_data = {
+                p_hpa: data.p_hpa,
+                T:     data.T[0],
+                Td:    data.Td[0],
+            };
+            draw();
+        });
+    });
+
+    document.getElementById("time_slider").addEventListener("input", (e) => {
+        if (!model_data) return;
+        current_time = +e.target.value;
+        document.getElementById("time_label").textContent = model_data.times[current_time] + " UTC";
+        sounding_data = {
+            p_hpa: model_data.p_hpa,
+            T:     model_data.T[current_time],
+            Td:    model_data.Td[current_time],
+        };
         draw();
     });
 

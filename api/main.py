@@ -17,11 +17,13 @@
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 
 import numpy as np
+import pandas as pd
 from skewT import get_static_lines, skew_transform
+from open_meteo import get_sounding
 
 app = FastAPI()
 
@@ -58,6 +60,44 @@ def sounding():
         "p_hpa":  p_hpa.tolist(),
         "T":      T_skew.tolist(),
         "Td":     Td_skew.tolist(),
+    }
+
+
+@app.get("/api/model_sounding")
+def model_sounding(
+    lat:   float = Query(...),
+    lon:   float = Query(...),
+    model: str   = Query(...),
+    date:  str   = Query(...),
+):
+    try:
+        ds = get_sounding(lat, lon, model, date)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    p_pa   = ds["p"].values
+    n_time = ds.sizes["time"]
+
+    T_k  = ds["T"].values   # (time, p)
+    Td_k = ds["Td"].values  # (time, p)
+
+    T_skew  = np.array([skew_transform(T_k[t],  p_pa, skew_factor=35) for t in range(n_time)])
+    Td_skew = np.array([skew_transform(Td_k[t], p_pa, skew_factor=35) for t in range(n_time)])
+
+    return {
+        "p_hpa":  (p_pa / 100).tolist(),
+        "times":  pd.DatetimeIndex(ds["time"].values).strftime("%H:%M").tolist(),
+        "T":      T_skew.tolist(),
+        "Td":     Td_skew.tolist(),
+        "z":      ds["z"].values.tolist(),
+        "z_agl":  ds["z_agl"].values.tolist(),
+        "rh":     ds["rh"].values.tolist(),
+        "ws":     ds["ws"].values.tolist(),
+        "wd":     ds["wd"].values.tolist(),
+        "qt":     ds["qt"].values.tolist(),
+        "ql":     ds["ql"].values.tolist(),
+        "theta":  ds["theta"].values.tolist(),
+        "thetav": ds["thetav"].values.tolist(),
     }
 
 

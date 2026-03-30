@@ -38,15 +38,15 @@
                     <div class="section-body">
                         <label>
                             Latitude
-                            <input type="text" placeholder="52.0">
+                            <input type="text" id="lat_input" placeholder="52.0">
                         </label>
                         <label>
                             Longitude
-                            <input type="text" placeholder="6">
+                            <input type="text" id="lon_input" placeholder="6">
                         </label>
                         <label>
                             Date
-                            <input type="date" value="2026-03-29">
+                            <input type="date" id="date_input" value="2026-03-29">
                         </label>
                         <button>
                             <span class="material-icons">my_location</span> Here and now
@@ -99,7 +99,7 @@
                                 <option value="ukmo_seamless">UKMO seamless</option>
                             </select>
                         </label>
-                        <button>
+                        <button id="fetch_model_btn">
                             <span class="material-icons">download</span> Fetch model data
                         </button>
                     </div>
@@ -126,6 +126,16 @@
                         <label>
                             Sounding file
                             <input type="file" id="sounding_upload" accept=".txt,.csv">
+                        </label>
+                    </div>
+                </details>
+
+                <details class="section" id="time_section" style="display:none">
+                    <summary><span class="material-icons">schedule</span> Time</summary>
+                    <div class="section-body">
+                        <label>
+                            <span id="time_label">00:00 UTC</span>
+                            <input type="range" id="time_slider" min="0" max="23" value="0" step="1">
                         </label>
                     </div>
                 </details>
