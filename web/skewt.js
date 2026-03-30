@@ -24,12 +24,8 @@
     let model_data = null;
     let current_time = 0;
 
-    Promise.all([
-        fetch("/api/background").then(r => r.json()),
-        fetch("/api/sounding").then(r => r.json()),
-    ]).then(([bg, snd]) => {
+    fetch("/api/background").then(r => r.json()).then(bg => {
         bg_data = bg;
-        sounding_data = snd;
         draw();
     });
 
@@ -48,18 +44,18 @@
         fetch(url).then(r => r.json()).then(data => {
             spinner.style.display = "none";
             model_data = data;
-            current_time = 0;
+            current_time = 12;
 
             const slider = document.getElementById("time_slider");
             slider.max = data.times.length - 1;
-            slider.value = 0;
-            document.getElementById("time_label").textContent = data.times[0] + " UTC";
+            slider.value = current_time;
+            document.getElementById("time_label").textContent = data.times[current_time] + " UTC";
             document.getElementById("time_section").style.display = "";
 
             sounding_data = {
                 p_hpa: data.p_hpa,
-                T:     data.T[0],
-                Td:    data.Td[0],
+                T:     data.T[current_time],
+                Td:    data.Td[current_time],
             };
             draw();
         });

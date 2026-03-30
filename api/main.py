@@ -45,24 +45,6 @@ def background():
     }
 
 
-@app.get("/api/sounding")
-def sounding():
-    # Hardcoded example sounding (mid-latitude summer).
-    p_hpa = np.array([1013, 925, 850, 700, 500, 400, 300, 250, 200, 100], dtype=float)
-    T_c   = np.array([  25,  20,  14,   5,  -8, -18, -36, -46, -57, -70], dtype=float)
-    Td_c  = np.array([  16,  13,   9,   0, -20, -33, -52, -62, -72, -85], dtype=float)
-
-    p_pa = p_hpa * 100
-    T_skew  = skew_transform(T_c  + 273.15, p_pa, skew_factor=35)
-    Td_skew = skew_transform(Td_c + 273.15, p_pa, skew_factor=35)
-
-    return {
-        "p_hpa":  p_hpa.tolist(),
-        "T":      T_skew.tolist(),
-        "Td":     Td_skew.tolist(),
-    }
-
-
 @app.get("/api/model_sounding")
 def model_sounding(
     lat:   float = Query(...),
