@@ -159,8 +159,8 @@
                     .call(drag);
             }
 
-            draw_profile(t_pts,  "#e0333c");
-            draw_profile(td_pts, "#2a7ec8");
+            draw_profile(t_pts,  "#EB0056");
+            draw_profile(td_pts, "#0056EB");
         }
 
         g.append("g").call(d3.axisLeft(y)
@@ -185,6 +185,20 @@
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
             .text("Temperature (°C)");
+
+        if (model_data) {
+            const lat   = document.getElementById("lat_input").value;
+            const lon   = document.getElementById("lon_input").value;
+            const date  = document.getElementById("date_input").value;
+            const model = document.getElementById("model_select").selectedOptions[0].text;
+            const time  = model_data.times[current_time];
+            g.append("text")
+                .attr("x", W / 2).attr("y", -10)
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("fill", "#444")
+                .text(`${lat}°N, ${lon}°E  |  ${date} ${time} UTC  |  model=${model}`);
+        }
     }
 
     document.getElementById("download_btn").addEventListener("click", () => {
