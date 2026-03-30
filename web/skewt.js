@@ -15,8 +15,7 @@
 // limitations under the License.
 //
 
-(function () {
-    const svg = d3.select("#skewt");
+const svg = d3.select("#skewt");
     const margin = { top: 30, right: 30, bottom: 65, left: 70 };
     let bg_data = null;
     let sounding_data = null;
@@ -239,6 +238,5 @@
         });
     });
 
-    draw();
-    window.addEventListener("resize", draw);
-})();
+draw();
+window.addEventListener("resize", draw);
