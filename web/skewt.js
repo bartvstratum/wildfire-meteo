@@ -16,21 +16,22 @@
 //
 
 const svg = d3.select("#skewt");
+
 const margin = { top: 30, right: 30, bottom: 65, left: 70 };
+
 let bg_data = null;
 let sounding_data = null;
+let model_data = null;
+let current_time = 0;
 
 const color_T   = "#EB0056";
 const color_Td  = "#0056EB";
 const font_size = "14px";
 
-let model_data = null;
-let current_time = 0;
-
 fetch("/api/background").then(r => r.json()).then(bg =>
 {
     bg_data = bg;
-    draw();
+    draw_skewt();
 });
 
 document.getElementById("fetch_model_btn").addEventListener("click", () =>
@@ -55,6 +56,7 @@ document.getElementById("fetch_model_btn").addEventListener("click", () =>
         const slider = document.getElementById("time_slider");
         slider.max = data.times.length - 1;
         slider.value = current_time;
+
         document.getElementById("time_label").textContent = data.times[current_time] + " UTC";
         document.getElementById("time_section").style.display = "";
 
@@ -63,29 +65,35 @@ document.getElementById("fetch_model_btn").addEventListener("click", () =>
             T:     data.T[current_time],
             Td:    data.Td[current_time],
         };
-        draw();
+
+        draw_skewt();
     });
 });
 
 document.getElementById("time_slider").addEventListener("input", (e) =>
 {
     if (!model_data) return;
+
     current_time = +e.target.value;
     document.getElementById("time_label").textContent = model_data.times[current_time] + " UTC";
+
     sounding_data = {
         p_hpa: model_data.p_hpa,
         T:     model_data.T[current_time],
         Td:    model_data.Td[current_time],
     };
-    draw();
+
+    draw_skewt();
 });
 
-function draw_lines(chart, x, y, temps, pressures_pa, color)
+function draw_skewt_lines(chart, x, y, temps, pressures_pa, color)
 {
     const p_hpa = pressures_pa.map(p => p / 100);
+
     const line_gen = d3.line()
         .x((T, i) => x(T))
         .y((T, i) => y(p_hpa[i]));
+
     temps.forEach(line =>
     {
         chart.append("path")
@@ -98,7 +106,7 @@ function draw_lines(chart, x, y, temps, pressures_pa, color)
     });
 }
 
-function draw()
+function draw_skewt()
 {
     svg.selectAll("*").remove();
 
@@ -124,10 +132,10 @@ function draw()
 
     if (bg_data)
     {
-        draw_lines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
-        draw_lines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");
-        draw_lines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
-        draw_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
+        draw_skewt_lines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
+        draw_skewt_lines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");
+        draw_skewt_lines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
+        draw_skewt_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
     }
 
     if (sounding_data)
@@ -139,7 +147,7 @@ function draw()
         const t_pts  = sounding_data.T.map( (t, i) => [t, sounding_data.p_hpa[i]]);
         const td_pts = sounding_data.Td.map((t, i) => [t, sounding_data.p_hpa[i]]);
 
-        function draw_profile(pts, color)
+        function draw_skewt_profile(pts, color)
         {
             const path = chart.append("path").datum(pts)
                 .attr("fill", "none")
@@ -175,8 +183,8 @@ function draw()
                 .call(drag);
         }
 
-        draw_profile(t_pts,  color_T);
-        draw_profile(td_pts, color_Td);
+        draw_skewt_profile(t_pts,  color_T);
+        draw_skewt_profile(td_pts, color_Td);
 
         const legend_items = [
             { label: "T (model)",  color: color_T  },
@@ -255,5 +263,6 @@ document.getElementById("download_btn").addEventListener("click", () =>
     });
 });
 
-draw();
-window.addEventListener("resize", draw);
+draw_skewt();
+
+window.addEventListener("resize", draw_skewt);
