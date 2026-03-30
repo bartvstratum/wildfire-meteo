@@ -38,5 +38,13 @@
 
     document.getElementById("here_and_now_btn").addEventListener("click", here_and_now);
 
+    document.getElementById("case_select").addEventListener("change", (e) => {
+        if (!e.target.value) return;
+        const [, date, lat, lon] = e.target.value.split("|");
+        document.getElementById("lat_input").value  = lat;
+        document.getElementById("lon_input").value  = lon;
+        document.getElementById("date_input").value = date;
+    });
+
     here_and_now();
 })();
