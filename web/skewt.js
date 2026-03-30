@@ -21,6 +21,10 @@
     let bg_data = null;
     let sounding_data = null;
 
+    const color_T   = "#EB0056";
+    const color_Td  = "#0056EB";
+    const font_size = "14px";
+
     let model_data = null;
     let current_time = 0;
 
@@ -159,31 +163,55 @@
                     .call(drag);
             }
 
-            draw_profile(t_pts,  "#EB0056");
-            draw_profile(td_pts, "#0056EB");
+            draw_profile(t_pts,  color_T);
+            draw_profile(td_pts, color_Td);
+
+            const legend_items = [
+                { label: "T (model)",  color: color_T  },
+                { label: "Td (model)", color: color_Td },
+            ];
+            const line_len = 22;
+            const row_h    = 22;
+
+            const legend = g.append("g").attr("transform", "translate(10,10)");
+
+            legend_items.forEach((item, i) => {
+                const y_off = i * row_h;
+                legend.append("line")
+                    .attr("x1", 0).attr("x2", line_len)
+                    .attr("y1", y_off + 6).attr("y2", y_off + 6)
+                    .attr("stroke", item.color)
+                    .attr("stroke-width", 2.5);
+                legend.append("text")
+                    .attr("x", line_len + 6).attr("y", y_off + 10)
+                    .attr("text-anchor", "start")
+                    .style("font-size", font_size)
+                    .style("fill", "#333")
+                    .text(item.label);
+            });
         }
 
         g.append("g").call(d3.axisLeft(y)
             .tickValues([1000, 850, 700, 500, 400, 300, 200, 100])
             .tickFormat(d => d))
-            .selectAll("text").style("font-size", "14px");
+            .selectAll("text").style("font-size", font_size);
 
         g.append("g")
             .attr("transform", `translate(0,${H})`)
             .call(d3.axisBottom(x).ticks(8).tickFormat(d => d + "°"))
-            .selectAll("text").style("font-size", "14px");
+            .selectAll("text").style("font-size", font_size);
 
         g.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -H / 2).attr("y", -42)
             .attr("text-anchor", "middle")
-            .style("font-size", "14px")
+            .style("font-size", font_size)
             .text("Pressure (hPa)");
 
         g.append("text")
             .attr("x", W / 2).attr("y", H + 38)
             .attr("text-anchor", "middle")
-            .style("font-size", "14px")
+            .style("font-size", font_size)
             .text("Temperature (°C)");
 
         if (model_data) {
@@ -195,7 +223,7 @@
             g.append("text")
                 .attr("x", W / 2).attr("y", -10)
                 .attr("text-anchor", "middle")
-                .style("font-size", "14px")
+                .style("font-size", font_size)
                 .style("fill", "#444")
                 .text(`${lat}°N, ${lon}°E  |  ${date} ${time} UTC  |  model=${model}`);
         }
