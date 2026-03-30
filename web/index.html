@@ -105,6 +105,10 @@
                         <button id="fetch_model_btn">
                             <span class="material-icons">download</span> Fetch model data
                         </button>
+                        <label id="time_section" style="display:none">
+                            <span id="time_label">00:00 UTC</span>
+                            <input type="range" id="time_slider" min="0" max="23" value="0" step="1">
+                        </label>
                     </div>
                 </details>
 
@@ -129,16 +133,6 @@
                         <label>
                             Sounding file
                             <input type="file" id="sounding_upload" accept=".txt,.csv">
-                        </label>
-                    </div>
-                </details>
-
-                <details class="section" id="time_section" style="display:none">
-                    <summary><span class="material-icons">schedule</span> Time</summary>
-                    <div class="section-body">
-                        <label>
-                            <span id="time_label">00:00 UTC</span>
-                            <input type="range" id="time_slider" min="0" max="23" value="0" step="1">
                         </label>
                     </div>
                 </details>
