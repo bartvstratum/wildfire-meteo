@@ -41,8 +41,12 @@
 
         if (!lat || !lon || !date) return;
 
+        const spinner = document.getElementById("plot_spinner");
+        spinner.style.display = "";
+
         const url = `/api/model_sounding?lat=${lat}&lon=${lon}&model=${model}&date=${date}`;
         fetch(url).then(r => r.json()).then(data => {
+            spinner.style.display = "none";
             model_data = data;
             current_time = 0;
 
