@@ -187,6 +187,16 @@
             .text("Temperature (°C)");
     }
 
+    document.getElementById("download_btn").addEventListener("click", () => {
+        const node = document.querySelector(".plot");
+        domtoimage.toPng(node).then(data_url => {
+            const a = document.createElement("a");
+            a.download = "skewt.png";
+            a.href = data_url;
+            a.click();
+        });
+    });
+
     draw();
     window.addEventListener("resize", draw);
 })();

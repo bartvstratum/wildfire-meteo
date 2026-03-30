@@ -26,6 +26,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="style.css">
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
     </head>
 
     <body>
@@ -77,12 +78,19 @@
                 </details>
             </aside>
 
-            <section class="plot">
-                <svg id="skewt" style="width:100%;height:100%;display:block;"></svg>
-                <div id="plot_spinner" class="plot-spinner" style="display:none;">
-                    <div class="spinner"></div>
+            <div class="plot-container">
+                <section class="plot">
+                    <svg id="skewt" style="width:100%;height:100%;display:block;"></svg>
+                    <div id="plot_spinner" class="plot-spinner" style="display:none;">
+                        <div class="spinner"></div>
+                    </div>
+                </section>
+                <div class="plot-toolbar">
+                    <button id="download_btn" title="Save as PNG">
+                        <span class="material-icons">download</span> Save PNG
+                    </button>
                 </div>
-            </section>
+            </div>
 
             <aside class="sidebar right">
                 <details class="section" open>

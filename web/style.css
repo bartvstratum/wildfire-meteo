@@ -276,9 +276,47 @@ main {
     align-items: center;
     justify-content: center;
     background: var(--color-surface);
-    min-width: 0;
     padding: 1rem;
     position: relative;
+}
+
+.plot-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.plot-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+}
+
+.plot-toolbar button {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.plot-toolbar button:hover {
+    background: var(--color-bg);
+}
+
+.plot-toolbar button .material-icons {
+    font-size: 1rem;
 }
 
 .plot-spinner {
