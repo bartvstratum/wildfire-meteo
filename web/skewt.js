@@ -16,227 +16,244 @@
 //
 
 const svg = d3.select("#skewt");
-    const margin = { top: 30, right: 30, bottom: 65, left: 70 };
-    let bg_data = null;
-    let sounding_data = null;
+const margin = { top: 30, right: 30, bottom: 65, left: 70 };
+let bg_data = null;
+let sounding_data = null;
 
-    const color_T   = "#EB0056";
-    const color_Td  = "#0056EB";
-    const font_size = "14px";
+const color_T   = "#EB0056";
+const color_Td  = "#0056EB";
+const font_size = "14px";
 
-    let model_data = null;
-    let current_time = 0;
+let model_data = null;
+let current_time = 0;
 
-    fetch("/api/background").then(r => r.json()).then(bg => {
-        bg_data = bg;
-        draw();
-    });
+fetch("/api/background").then(r => r.json()).then(bg =>
+{
+    bg_data = bg;
+    draw();
+});
 
-    document.getElementById("fetch_model_btn").addEventListener("click", () => {
-        const lat   = document.getElementById("lat_input").value;
-        const lon   = document.getElementById("lon_input").value;
-        const date  = document.getElementById("date_input").value;
-        const model = document.getElementById("model_select").value;
+document.getElementById("fetch_model_btn").addEventListener("click", () =>
+{
+    const lat   = document.getElementById("lat_input").value;
+    const lon   = document.getElementById("lon_input").value;
+    const date  = document.getElementById("date_input").value;
+    const model = document.getElementById("model_select").value;
 
-        if (!lat || !lon || !date) return;
+    if (!lat || !lon || !date) return;
 
-        const spinner = document.getElementById("plot_spinner");
-        spinner.style.display = "";
+    const spinner = document.getElementById("plot_spinner");
+    spinner.style.display = "";
 
-        const url = `/api/model_sounding?lat=${lat}&lon=${lon}&model=${model}&date=${date}`;
-        fetch(url).then(r => r.json()).then(data => {
-            spinner.style.display = "none";
-            model_data = data;
-            current_time = 12;
+    const url = `/api/model_sounding?lat=${lat}&lon=${lon}&model=${model}&date=${date}`;
+    fetch(url).then(r => r.json()).then(data =>
+    {
+        spinner.style.display = "none";
+        model_data = data;
+        current_time = 12;
 
-            const slider = document.getElementById("time_slider");
-            slider.max = data.times.length - 1;
-            slider.value = current_time;
-            document.getElementById("time_label").textContent = data.times[current_time] + " UTC";
-            document.getElementById("time_section").style.display = "";
+        const slider = document.getElementById("time_slider");
+        slider.max = data.times.length - 1;
+        slider.value = current_time;
+        document.getElementById("time_label").textContent = data.times[current_time] + " UTC";
+        document.getElementById("time_section").style.display = "";
 
-            sounding_data = {
-                p_hpa: data.p_hpa,
-                T:     data.T[current_time],
-                Td:    data.Td[current_time],
-            };
-            draw();
-        });
-    });
-
-    document.getElementById("time_slider").addEventListener("input", (e) => {
-        if (!model_data) return;
-        current_time = +e.target.value;
-        document.getElementById("time_label").textContent = model_data.times[current_time] + " UTC";
         sounding_data = {
-            p_hpa: model_data.p_hpa,
-            T:     model_data.T[current_time],
-            Td:    model_data.Td[current_time],
+            p_hpa: data.p_hpa,
+            T:     data.T[current_time],
+            Td:    data.Td[current_time],
         };
         draw();
     });
+});
 
-    function drawLines(chart, x, y, temps, pressures_pa, color) {
-        const p_hpa = pressures_pa.map(p => p / 100);
-        const lineGen = d3.line()
-            .x((T, i) => x(T))
-            .y((T, i) => y(p_hpa[i]));
-        temps.forEach(line => {
-            chart.append("path")
-                .datum(line)
+document.getElementById("time_slider").addEventListener("input", (e) =>
+{
+    if (!model_data) return;
+    current_time = +e.target.value;
+    document.getElementById("time_label").textContent = model_data.times[current_time] + " UTC";
+    sounding_data = {
+        p_hpa: model_data.p_hpa,
+        T:     model_data.T[current_time],
+        Td:    model_data.Td[current_time],
+    };
+    draw();
+});
+
+function draw_lines(chart, x, y, temps, pressures_pa, color)
+{
+    const p_hpa = pressures_pa.map(p => p / 100);
+    const line_gen = d3.line()
+        .x((T, i) => x(T))
+        .y((T, i) => y(p_hpa[i]));
+    temps.forEach(line =>
+    {
+        chart.append("path")
+            .datum(line)
+            .attr("fill", "none")
+            .attr("stroke", color)
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "4,2")
+            .attr("d", line_gen);
+    });
+}
+
+function draw()
+{
+    svg.selectAll("*").remove();
+
+    const W = svg.node().clientWidth  - margin.left - margin.right;
+    const H = svg.node().clientHeight - margin.top  - margin.bottom;
+    if (W <= 0 || H <= 0) return;
+
+    const x = d3.scaleLinear().domain([-40, 50]).range([0, W]);
+    const y = d3.scaleLog().domain([1013, 100]).range([H, 0]);
+
+    const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    g.append("rect")
+        .attr("width", W).attr("height", H)
+        .attr("fill", "white").attr("stroke", "#ccc");
+
+    // Clip path so background lines don't overflow the plot area.
+    g.append("clipPath").attr("id", "skewt-clip")
+        .append("rect").attr("width", W).attr("height", H);
+
+    const chart = g.append("g").attr("clip-path", "url(#skewt-clip)");
+
+    if (bg_data)
+    {
+        draw_lines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
+        draw_lines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");
+        draw_lines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
+        draw_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
+    }
+
+    if (sounding_data)
+    {
+        const line = d3.line()
+            .x(d => x(d[0]))
+            .y(d => y(d[1]));
+
+        const t_pts  = sounding_data.T.map( (t, i) => [t, sounding_data.p_hpa[i]]);
+        const td_pts = sounding_data.Td.map((t, i) => [t, sounding_data.p_hpa[i]]);
+
+        function draw_profile(pts, color)
+        {
+            const path = chart.append("path").datum(pts)
                 .attr("fill", "none")
                 .attr("stroke", color)
-                .attr("stroke-width", 1)
-                .attr("stroke-dasharray", "4,2")
-                .attr("d", lineGen);
-        });
-    }
+                .attr("stroke-width", 2.5)
+                .attr("d", line);
 
-    function draw() {
-        svg.selectAll("*").remove();
+            const drag = d3.drag()
+                .on("start", function ()
+                {
+                    d3.select(this).style("cursor", "grabbing");
+                })
+                .on("drag", function (event, d)
+                {
+                    d[0] = x.invert(event.x);
+                    d3.select(this).attr("cx", x(d[0]));
+                    path.attr("d", line);
+                })
+                .on("end", function ()
+                {
+                    d3.select(this).style("cursor", "grab");
+                });
 
-        const W = svg.node().clientWidth  - margin.left - margin.right;
-        const H = svg.node().clientHeight - margin.top  - margin.bottom;
-        if (W <= 0 || H <= 0) return;
-
-        const x = d3.scaleLinear().domain([-40, 50]).range([0, W]);
-        const y = d3.scaleLog().domain([1013, 100]).range([H, 0]);
-
-        const g = svg.append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        g.append("rect")
-            .attr("width", W).attr("height", H)
-            .attr("fill", "white").attr("stroke", "#ccc");
-
-        // Clip path so background lines don't overflow the plot area.
-        g.append("clipPath").attr("id", "skewt-clip")
-            .append("rect").attr("width", W).attr("height", H);
-
-        const chart = g.append("g").attr("clip-path", "url(#skewt-clip)");
-
-        if (bg_data) {
-            drawLines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
-            drawLines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");
-            drawLines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
-            drawLines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
+            chart.selectAll(null).data(pts).enter()
+                .append("circle")
+                .attr("cx", d => x(d[0]))
+                .attr("cy", d => y(d[1]))
+                .attr("r", 5)
+                .attr("fill", "white")
+                .attr("stroke", color)
+                .attr("stroke-width", 2)
+                .style("cursor", "grab")
+                .call(drag);
         }
 
-        if (sounding_data) {
-            const line = d3.line()
-                .x(d => x(d[0]))
-                .y(d => y(d[1]));
+        draw_profile(t_pts,  color_T);
+        draw_profile(td_pts, color_Td);
 
-            const t_pts  = sounding_data.T.map( (t, i) => [t, sounding_data.p_hpa[i]]);
-            const td_pts = sounding_data.Td.map((t, i) => [t, sounding_data.p_hpa[i]]);
+        const legend_items = [
+            { label: "T (model)",  color: color_T  },
+            { label: "Td (model)", color: color_Td },
+        ];
+        const line_len = 22;
+        const row_h    = 22;
 
-            function draw_profile(pts, color) {
-                const path = chart.append("path").datum(pts)
-                    .attr("fill", "none")
-                    .attr("stroke", color)
-                    .attr("stroke-width", 2.5)
-                    .attr("d", line);
+        const legend = g.append("g").attr("transform", "translate(10,10)");
 
-                const drag = d3.drag()
-                    .on("start", function () {
-                        d3.select(this).style("cursor", "grabbing");
-                    })
-                    .on("drag", function (event, d) {
-                        d[0] = x.invert(event.x);
-                        d3.select(this).attr("cx", x(d[0]));
-                        path.attr("d", line);
-                    })
-                    .on("end", function () {
-                        d3.select(this).style("cursor", "grab");
-                    });
-
-                chart.selectAll(null).data(pts).enter()
-                    .append("circle")
-                    .attr("cx", d => x(d[0]))
-                    .attr("cy", d => y(d[1]))
-                    .attr("r", 5)
-                    .attr("fill", "white")
-                    .attr("stroke", color)
-                    .attr("stroke-width", 2)
-                    .style("cursor", "grab")
-                    .call(drag);
-            }
-
-            draw_profile(t_pts,  color_T);
-            draw_profile(td_pts, color_Td);
-
-            const legend_items = [
-                { label: "T (model)",  color: color_T  },
-                { label: "Td (model)", color: color_Td },
-            ];
-            const line_len = 22;
-            const row_h    = 22;
-
-            const legend = g.append("g").attr("transform", "translate(10,10)");
-
-            legend_items.forEach((item, i) => {
-                const y_off = i * row_h;
-                legend.append("line")
-                    .attr("x1", 0).attr("x2", line_len)
-                    .attr("y1", y_off + 6).attr("y2", y_off + 6)
-                    .attr("stroke", item.color)
-                    .attr("stroke-width", 2.5);
-                legend.append("text")
-                    .attr("x", line_len + 6).attr("y", y_off + 10)
-                    .attr("text-anchor", "start")
-                    .style("font-size", font_size)
-                    .style("fill", "#333")
-                    .text(item.label);
-            });
-        }
-
-        g.append("g").call(d3.axisLeft(y)
-            .tickValues([1000, 850, 700, 500, 400, 300, 200, 100])
-            .tickFormat(d => d))
-            .selectAll("text").style("font-size", font_size);
-
-        g.append("g")
-            .attr("transform", `translate(0,${H})`)
-            .call(d3.axisBottom(x).ticks(8).tickFormat(d => d + "°"))
-            .selectAll("text").style("font-size", font_size);
-
-        g.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("x", -H / 2).attr("y", -42)
-            .attr("text-anchor", "middle")
-            .style("font-size", font_size)
-            .text("Pressure (hPa)");
-
-        g.append("text")
-            .attr("x", W / 2).attr("y", H + 38)
-            .attr("text-anchor", "middle")
-            .style("font-size", font_size)
-            .text("Temperature (°C)");
-
-        if (model_data) {
-            const lat   = document.getElementById("lat_input").value;
-            const lon   = document.getElementById("lon_input").value;
-            const date  = document.getElementById("date_input").value;
-            const model = document.getElementById("model_select").selectedOptions[0].text;
-            const time  = model_data.times[current_time];
-            g.append("text")
-                .attr("x", W / 2).attr("y", -10)
-                .attr("text-anchor", "middle")
+        legend_items.forEach((item, i) =>
+        {
+            const y_off = i * row_h;
+            legend.append("line")
+                .attr("x1", 0).attr("x2", line_len)
+                .attr("y1", y_off + 6).attr("y2", y_off + 6)
+                .attr("stroke", item.color)
+                .attr("stroke-width", 2.5);
+            legend.append("text")
+                .attr("x", line_len + 6).attr("y", y_off + 10)
+                .attr("text-anchor", "start")
                 .style("font-size", font_size)
-                .style("fill", "#444")
-                .text(`${lat}°N, ${lon}°E  |  ${date} ${time} UTC  |  model=${model}`);
-        }
+                .style("fill", "#333")
+                .text(item.label);
+        });
     }
 
-    document.getElementById("download_btn").addEventListener("click", () => {
-        const node = document.querySelector(".plot");
-        domtoimage.toPng(node).then(data_url => {
-            const a = document.createElement("a");
-            a.download = "skewt.png";
-            a.href = data_url;
-            a.click();
-        });
+    g.append("g").call(d3.axisLeft(y)
+        .tickValues([1000, 850, 700, 500, 400, 300, 200, 100])
+        .tickFormat(d => d))
+        .selectAll("text").style("font-size", font_size);
+
+    g.append("g")
+        .attr("transform", `translate(0,${H})`)
+        .call(d3.axisBottom(x).ticks(8).tickFormat(d => d + "°"))
+        .selectAll("text").style("font-size", font_size);
+
+    g.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -H / 2).attr("y", -42)
+        .attr("text-anchor", "middle")
+        .style("font-size", font_size)
+        .text("Pressure (hPa)");
+
+    g.append("text")
+        .attr("x", W / 2).attr("y", H + 38)
+        .attr("text-anchor", "middle")
+        .style("font-size", font_size)
+        .text("Temperature (°C)");
+
+    if (model_data)
+    {
+        const lat   = document.getElementById("lat_input").value;
+        const lon   = document.getElementById("lon_input").value;
+        const date  = document.getElementById("date_input").value;
+        const model = document.getElementById("model_select").selectedOptions[0].text;
+        const time  = model_data.times[current_time];
+        g.append("text")
+            .attr("x", W / 2).attr("y", -10)
+            .attr("text-anchor", "middle")
+            .style("font-size", font_size)
+            .style("fill", "#444")
+            .text(`${lat}°N, ${lon}°E  |  ${date} ${time} UTC  |  model=${model}`);
+    }
+}
+
+document.getElementById("download_btn").addEventListener("click", () =>
+{
+    const node = document.querySelector(".plot");
+    domtoimage.toPng(node).then(data_url =>
+    {
+        const a = document.createElement("a");
+        a.download = "skewt.png";
+        a.href = data_url;
+        a.click();
     });
+});
 
 draw();
 window.addEventListener("resize", draw);
