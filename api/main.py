@@ -20,15 +20,14 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 
-import numpy as np
 import pandas as pd
-from skewT import get_static_lines, skew_transform
+from skewT import get_static_lines
 from open_meteo import get_sounding
 
 app = FastAPI()
 
 # Cache at startup — background lines never change.
-_lines = get_static_lines(skew_factor=35, ktot=64)
+_lines = get_static_lines(ktot=64)
 
 
 @app.get("/api/background")
@@ -57,20 +56,13 @@ def model_sounding(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    p_pa   = ds["p"].values
-    n_time = ds.sizes["time"]
-
-    T_k  = ds["T"].values   # (time, p)
-    Td_k = ds["Td"].values  # (time, p)
-
-    T_skew  = np.array([skew_transform(T_k[t],  p_pa, skew_factor=35) for t in range(n_time)])
-    Td_skew = np.array([skew_transform(Td_k[t], p_pa, skew_factor=35) for t in range(n_time)])
+    p_pa = ds["p"].values
 
     return {
         "p_hpa":  (p_pa / 100).tolist(),
         "times":  pd.DatetimeIndex(ds["time"].values).strftime("%H:%M").tolist(),
-        "T":      T_skew.tolist(),
-        "Td":     Td_skew.tolist(),
+        "T":      ds["T"].values.tolist(),
+        "Td":     ds["Td"].values.tolist(),
         "z":      ds["z"].values.tolist(),
         "z_agl":  ds["z_agl"].values.tolist(),
         "rh":     ds["rh"].values.tolist(),

@@ -20,35 +20,13 @@ import numpy as np
 import thermo as thrm
 
 
-def skew_transform(T, p, skew_factor):
-    """
-    Apply skew-T log-p transform.
 
-    Parameters:
-    ----------
-    T : float or np.ndarray
-        Temperature in Kelvin.
-    p : float or np.ndarray
-        Pressure in Pa.
-
-    Returns:
-    -------
-    float or np.ndarray
-        Skewed temperature in degrees Celsius.
-    """
-    Tc = T - thrm.T0
-    p_hpa = p / 100.0
-    return Tc + skew_factor * (np.log(1000.0) - np.log(p_hpa))
-
-
-def get_static_lines(skew_factor=35, ktot=64):
+def get_static_lines(ktot=64):
     """
     Calculate static background lines of a skew-T diagram.
 
     Parameters:
     ----------
-    skew_factor : float or int
-        Skewness factor of diagram.
     ktot : int
         Number of vertical levels in curved lines.
 
@@ -70,24 +48,19 @@ def get_static_lines(skew_factor=35, ktot=64):
 
     # Isotherms: lines of constant absolute temperature.
     x = x0_isotherms + thrm.T0
-    T = np.broadcast_to(x[np.newaxis, :], (p_isotherms.size, len(x)))
-    isotherms = skew_transform(T, p_isotherms[:, np.newaxis], skew_factor)
+    isotherms = np.broadcast_to(x[np.newaxis, :], (p_isotherms.size, len(x)))
 
     # Dry adiabats: lines of constant potential temperature.
     x = x0_dry_adiabats + thrm.T0
-    T = x[np.newaxis, :] * thrm.exner(p_dry[:, np.newaxis])
-    dry_adiabats = skew_transform(T, p_dry[:, np.newaxis], skew_factor)
+    dry_adiabats = x[np.newaxis, :] * thrm.exner(p_dry[:, np.newaxis])
 
     # Moist adiabats: lines of constant saturated potential temperature.
     x = x0_moist_adiabats + thrm.T0
-    T = thrm.calc_moist_adiabat(x, p_moist)
-    moist_adiabats = skew_transform(T, p_moist[:, np.newaxis], skew_factor)
+    moist_adiabats = thrm.calc_moist_adiabat(x, p_moist)
 
     # Isohumes: lines of constant specific humidity.
     x = x0_isohumes + thrm.T0
-    q_0 = thrm.qsat(x, thrm.p0)
-    T = thrm.dewpoint(q_0[np.newaxis, :], p_isohumes[:, np.newaxis])
-    isohumes = skew_transform(T, p_isohumes[:, np.newaxis], skew_factor)
+    isohumes = thrm.dewpoint(thrm.qsat(x, thrm.p0)[np.newaxis, :], p_isohumes[:, np.newaxis])
 
     return {
         "p_isotherms":    p_isotherms,

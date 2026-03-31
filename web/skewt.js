@@ -28,6 +28,13 @@ const color_T   = "#EB0056";
 const color_Td  = "#0056EB";
 const font_size = "14px";
 
+const skew_factor = 35;
+
+function skew_transform(T_k, p_hpa)
+{
+    return (T_k - 273.15) + skew_factor * (Math.log(1000) - Math.log(p_hpa));
+}
+
 fetch("/api/background").then(r => r.json()).then(bg =>
 {
     bg_data = bg;
@@ -91,8 +98,8 @@ function draw_skewt_lines(chart, x, y, temps, pressures_pa, color)
     const p_hpa = pressures_pa.map(p => p / 100);
 
     const line_gen = d3.line()
-        .x((T, i) => x(T))
-        .y((T, i) => y(p_hpa[i]));
+        .x((T, i) => x(skew_transform(T, p_hpa[i])))
+        .y((_, i) => y(p_hpa[i]));
 
     temps.forEach(line =>
     {
@@ -144,8 +151,8 @@ function draw_skewt()
             .x(d => x(d[0]))
             .y(d => y(d[1]));
 
-        const t_pts  = sounding_data.T.map( (t, i) => [t, sounding_data.p_hpa[i]]);
-        const td_pts = sounding_data.Td.map((t, i) => [t, sounding_data.p_hpa[i]]);
+        const t_pts  = sounding_data.T.map( (t, i) => [skew_transform(t,  sounding_data.p_hpa[i]), sounding_data.p_hpa[i]]);
+        const td_pts = sounding_data.Td.map((t, i) => [skew_transform(t,  sounding_data.p_hpa[i]), sounding_data.p_hpa[i]]);
 
         function draw_skewt_profile(pts, color)
         {
