@@ -80,6 +80,7 @@ document.getElementById("fetch_model_btn").addEventListener("click", () =>
             Td:    data.Td[current_time],
         };
 
+        document.getElementById("launch_parcel").disabled = false;
         draw_skewt();
     });
 });

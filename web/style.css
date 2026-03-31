@@ -157,6 +157,33 @@ main {
     width: 100%;
 }
 
+.sidebar input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--color-border-mid);
+    border-radius: 3px;
+    background: var(--color-surface);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.sidebar input[type="checkbox"]:checked {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 10px;
+}
+
+.sidebar input[type="checkbox"]:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
 .sidebar input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
