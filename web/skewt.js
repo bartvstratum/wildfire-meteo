@@ -95,6 +95,9 @@ document.getElementById("time_slider").addEventListener("input", (e) =>
     draw_skewt();
 });
 
+document.getElementById("launch_parcel").addEventListener("change", draw_skewt);
+document.getElementById("parcel_mode").addEventListener("change", draw_skewt);
+
 function draw_skewt_lines(chart, x, y, temps, pressures_pa, color)
 {
     const p_hpa = pressures_pa.map(p => p / 100);
@@ -195,38 +198,41 @@ function draw_skewt()
         draw_skewt_profile(t_pts,  color_T);
         draw_skewt_profile(td_pts, color_Td);
 
-        // Non-entraining parcel.
-        const p_pa = sounding_data.p_hpa.map(p => p * 100);
-        const p_pa_desc = [...p_pa].sort((a, b) => b - a);
-        const sfc_idx = p_pa.indexOf(p_pa_desc[0]);
-        const parcel = calc_non_entraining_parcel(
-            sounding_data.T[sfc_idx],
-            sounding_data.Td[sfc_idx],
-            p_pa_desc[0],
-            p_pa_desc,
-        );
-
-        const parcel_line = d3.line()
-            .x(d => x(skew_transform(d[0], d[1])))
-            .y(d => y(d[1]));
-
-        [[parcel.p_dry, parcel.T_dry], [parcel.p_isohume, parcel.T_isohume], [parcel.p_moist, parcel.T_moist]]
-            .forEach(([p_arr, T_arr]) =>
-            {
-                chart.append("path")
-                    .datum(p_arr.map((p, i) => [T_arr[i], p / 100]))
-                    .attr("fill", "none")
-                    .attr("stroke", "#000")
-                    .attr("stroke-width", 2)
-                    .attr("stroke-dasharray", "6,3")
-                    .attr("d", parcel_line);
-            });
-
         const legend_items = [
             { label: "T (model)",  color: color_T  },
             { label: "Td (model)", color: color_Td },
-            { label: "Parcel",     color: "#000", dashes: "6,3" },
         ];
+
+        if (document.getElementById("launch_parcel").checked)
+        {
+            const p_pa = sounding_data.p_hpa.map(p => p * 100);
+            const p_pa_desc = [...p_pa].sort((a, b) => b - a);
+            const sfc_idx = p_pa.indexOf(p_pa_desc[0]);
+            const parcel = calc_non_entraining_parcel(
+                sounding_data.T[sfc_idx],
+                sounding_data.Td[sfc_idx],
+                p_pa_desc[0],
+                p_pa_desc,
+            );
+
+            const parcel_line = d3.line()
+                .x(d => x(skew_transform(d[0], d[1])))
+                .y(d => y(d[1]));
+
+            [[parcel.p_dry, parcel.T_dry], [parcel.p_isohume, parcel.T_isohume], [parcel.p_moist, parcel.T_moist]]
+                .forEach(([p_arr, T_arr]) =>
+                {
+                    chart.append("path")
+                        .datum(p_arr.map((p, i) => [T_arr[i], p / 100]))
+                        .attr("fill", "none")
+                        .attr("stroke", "#000")
+                        .attr("stroke-width", 2)
+                        .attr("stroke-dasharray", "6,3")
+                        .attr("d", parcel_line);
+                });
+
+            legend_items.push({ label: "Parcel", color: "#000", dashes: "6,3" });
+        }
         const line_len = 22;
         const row_h    = 22;
 
