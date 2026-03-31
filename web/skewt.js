@@ -15,6 +15,8 @@
 // limitations under the License.
 //
 
+import { calc_non_entraining_parcel } from "./parcel.js";
+
 const svg = d3.select("#skewt");
 
 const margin = { top: 30, right: 30, bottom: 65, left: 70 };
@@ -193,9 +195,37 @@ function draw_skewt()
         draw_skewt_profile(t_pts,  color_T);
         draw_skewt_profile(td_pts, color_Td);
 
+        // Non-entraining parcel.
+        const p_pa = sounding_data.p_hpa.map(p => p * 100);
+        const p_pa_desc = [...p_pa].sort((a, b) => b - a);
+        const sfc_idx = p_pa.indexOf(p_pa_desc[0]);
+        const parcel = calc_non_entraining_parcel(
+            sounding_data.T[sfc_idx],
+            sounding_data.Td[sfc_idx],
+            p_pa_desc[0],
+            p_pa_desc,
+        );
+
+        const parcel_line = d3.line()
+            .x(d => x(skew_transform(d[0], d[1])))
+            .y(d => y(d[1]));
+
+        [[parcel.p_dry, parcel.T_dry], [parcel.p_isohume, parcel.T_isohume], [parcel.p_moist, parcel.T_moist]]
+            .forEach(([p_arr, T_arr]) =>
+            {
+                chart.append("path")
+                    .datum(p_arr.map((p, i) => [T_arr[i], p / 100]))
+                    .attr("fill", "none")
+                    .attr("stroke", "#000")
+                    .attr("stroke-width", 2)
+                    .attr("stroke-dasharray", "6,3")
+                    .attr("d", parcel_line);
+            });
+
         const legend_items = [
             { label: "T (model)",  color: color_T  },
             { label: "Td (model)", color: color_Td },
+            { label: "Parcel",     color: "#000", dashes: "6,3" },
         ];
         const line_len = 22;
         const row_h    = 22;
@@ -209,7 +239,8 @@ function draw_skewt()
                 .attr("x1", 0).attr("x2", line_len)
                 .attr("y1", y_off + 6).attr("y2", y_off + 6)
                 .attr("stroke", item.color)
-                .attr("stroke-width", 2.5);
+                .attr("stroke-width", 2.5)
+                .attr("stroke-dasharray", item.dashes ?? null);
             legend.append("text")
                 .attr("x", line_len + 6).attr("y", y_off + 10)
                 .attr("text-anchor", "start")

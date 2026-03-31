@@ -27,7 +27,7 @@ from open_meteo import get_sounding
 app = FastAPI()
 
 # Cache at startup — background lines never change.
-_lines = get_static_lines(ktot=64)
+_lines = get_static_lines(ktot=200)
 
 
 @app.get("/api/background")
