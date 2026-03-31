@@ -37,6 +37,11 @@ function skew_transform(T_k, p_hpa)
     return (T_k - 273.15) + skew_factor * (Math.log(1000) - Math.log(p_hpa));
 }
 
+function inv_skew_transform(T_skewed, p_hpa)
+{
+    return T_skewed - skew_factor * (Math.log(1000) - Math.log(p_hpa)) + 273.15;
+}
+
 fetch("/api/background").then(r => r.json()).then(bg =>
 {
     bg_data = bg;
@@ -159,7 +164,7 @@ function draw_skewt()
         const t_pts  = sounding_data.T.map( (t, i) => [skew_transform(t,  sounding_data.p_hpa[i]), sounding_data.p_hpa[i]]);
         const td_pts = sounding_data.Td.map((t, i) => [skew_transform(t,  sounding_data.p_hpa[i]), sounding_data.p_hpa[i]]);
 
-        function draw_skewt_profile(pts, color)
+        function draw_skewt_profile(pts, color, source_T)
         {
             const path = chart.append("path").datum(pts)
                 .attr("fill", "none")
@@ -177,10 +182,15 @@ function draw_skewt()
                     d[0] = x.invert(event.x);
                     d3.select(this).attr("cx", x(d[0]));
                     path.attr("d", line);
+
+                    const i = sounding_data.p_hpa.indexOf(d[1]);
+                    if (i !== -1)
+                        source_T[i] = inv_skew_transform(d[0], d[1]);
                 })
                 .on("end", function ()
                 {
                     d3.select(this).style("cursor", "grab");
+                    draw_skewt();
                 });
 
             chart.selectAll(null).data(pts).enter()
@@ -195,8 +205,8 @@ function draw_skewt()
                 .call(drag);
         }
 
-        draw_skewt_profile(t_pts,  color_T);
-        draw_skewt_profile(td_pts, color_Td);
+        draw_skewt_profile(t_pts,  color_T,  sounding_data.T);
+        draw_skewt_profile(td_pts, color_Td, sounding_data.Td);
 
         const legend_items = [
             { label: "T (model)",  color: color_T  },
