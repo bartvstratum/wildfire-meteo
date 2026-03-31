@@ -17,7 +17,7 @@
 
 import numpy as np
 
-import thermo as thrm
+from . import thermo as thrm
 
 
 

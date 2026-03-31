@@ -21,8 +21,8 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 
 import pandas as pd
-from skewT import get_static_lines
-from open_meteo import get_sounding
+from .skewT import get_static_lines
+from .open_meteo import get_sounding
 
 app = FastAPI()
 
