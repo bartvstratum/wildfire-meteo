@@ -137,7 +137,7 @@ def get_meteo(lat, lon, model, pressure_lev_vars, pressure_levs, single_lev_vars
     return data
 
 
-def get_sounding(lat, lon, model, date_str):
+def get_model_sounding(lat, lon, model, date_str):
     """
     Fetch a full atmospheric sounding for a single day from Open-Meteo.
 

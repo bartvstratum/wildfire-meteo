@@ -22,8 +22,8 @@ const svg = d3.select("#skewt");
 const margin = { top: 30, right: 30, bottom: 65, left: 70 };
 
 let bg_data = null;
-let sounding_data = null;
-let model_data = null;
+let model_sounding = null;
+let model_forecast = null;
 let current_time = 0;
 
 const color_T   = "#EB0056";
@@ -64,7 +64,7 @@ document.getElementById("fetch_model_btn").addEventListener("click", () =>
     fetch(url).then(r => r.json()).then(data =>
     {
         spinner.style.display = "none";
-        model_data = data;
+        model_forecast = data;
         current_time = 12;
 
         const slider = document.getElementById("time_slider");
@@ -74,7 +74,7 @@ document.getElementById("fetch_model_btn").addEventListener("click", () =>
         document.getElementById("time_label").textContent = data.times[current_time] + " UTC";
         document.getElementById("time_section").style.display = "";
 
-        sounding_data = {
+        model_sounding = {
             p_hpa: data.p_hpa,
             T:     data.T[current_time],
             Td:    data.Td[current_time],
@@ -87,15 +87,15 @@ document.getElementById("fetch_model_btn").addEventListener("click", () =>
 
 document.getElementById("time_slider").addEventListener("input", (e) =>
 {
-    if (!model_data) return;
+    if (!model_forecast) return;
 
     current_time = +e.target.value;
-    document.getElementById("time_label").textContent = model_data.times[current_time] + " UTC";
+    document.getElementById("time_label").textContent = model_forecast.times[current_time] + " UTC";
 
-    sounding_data = {
-        p_hpa: model_data.p_hpa,
-        T:     model_data.T[current_time],
-        Td:    model_data.Td[current_time],
+    model_sounding = {
+        p_hpa: model_forecast.p_hpa,
+        T:     model_forecast.T[current_time],
+        Td:    model_forecast.Td[current_time],
     };
 
     draw_skewt();
@@ -156,14 +156,14 @@ function draw_skewt()
         draw_skewt_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
     }
 
-    if (sounding_data)
+    if (model_sounding)
     {
         const line = d3.line()
             .x(d => x(d[0]))
             .y(d => y(d[1]));
 
-        const t_pts  = sounding_data.T.map( (t, i) => [skew_transform(t,  sounding_data.p_hpa[i]), sounding_data.p_hpa[i]]);
-        const td_pts = sounding_data.Td.map((t, i) => [skew_transform(t,  sounding_data.p_hpa[i]), sounding_data.p_hpa[i]]);
+        const t_pts  = model_sounding.T.map( (t, i) => [skew_transform(t,  model_sounding.p_hpa[i]), model_sounding.p_hpa[i]]);
+        const td_pts = model_sounding.Td.map((t, i) => [skew_transform(t,  model_sounding.p_hpa[i]), model_sounding.p_hpa[i]]);
 
         function redraw_parcel()
         {
@@ -171,12 +171,12 @@ function draw_skewt()
 
             if (!document.getElementById("launch_parcel").checked) return;
 
-            const p_pa = sounding_data.p_hpa.map(p => p * 100);
+            const p_pa = model_sounding.p_hpa.map(p => p * 100);
             const p_pa_desc = [...p_pa].sort((a, b) => b - a);
             const sfc_idx = p_pa.indexOf(p_pa_desc[0]);
             const parcel = calc_non_entraining_parcel(
-                sounding_data.T[sfc_idx],
-                sounding_data.Td[sfc_idx],
+                model_sounding.T[sfc_idx],
+                model_sounding.Td[sfc_idx],
                 p_pa_desc[0],
                 p_pa_desc,
             );
@@ -218,7 +218,7 @@ function draw_skewt()
                     d3.select(this).attr("cx", x(d[0]));
                     path.attr("d", line);
 
-                    const i = sounding_data.p_hpa.indexOf(d[1]);
+                    const i = model_sounding.p_hpa.indexOf(d[1]);
                     if (i !== -1)
                         source_T[i] = inv_skew_transform(d[0], d[1]);
 
@@ -242,8 +242,8 @@ function draw_skewt()
                 .call(drag);
         }
 
-        draw_skewt_profile(t_pts,  color_T,  sounding_data.T);
-        draw_skewt_profile(td_pts, color_Td, sounding_data.Td);
+        draw_skewt_profile(t_pts,  color_T,  model_sounding.T);
+        draw_skewt_profile(td_pts, color_Td, model_sounding.Td);
 
         redraw_parcel();
 
@@ -300,13 +300,13 @@ function draw_skewt()
         .style("font-size", font_size)
         .text("Temperature (°C)");
 
-    if (model_data)
+    if (model_forecast)
     {
         const lat   = document.getElementById("lat_input").value;
         const lon   = document.getElementById("lon_input").value;
         const date  = document.getElementById("date_input").value;
         const model = document.getElementById("model_select").selectedOptions[0].text;
-        const time  = model_data.times[current_time];
+        const time  = model_forecast.times[current_time];
         g.append("text")
             .attr("x", W / 2).attr("y", -10)
             .attr("text-anchor", "middle")

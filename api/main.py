@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 
 import pandas as pd
 from .skewT import get_static_lines
-from .open_meteo import get_sounding
+from .open_meteo import get_model_sounding
 
 app = FastAPI()
 
@@ -52,7 +52,7 @@ def model_sounding(
     date:  str   = Query(...),
 ):
     try:
-        ds = get_sounding(lat, lon, model, date)
+        ds = get_model_sounding(lat, lon, model, date)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
