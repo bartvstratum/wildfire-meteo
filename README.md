@@ -2,7 +2,7 @@
 
 ODET wildfire & meteo analysis tool.
 
-Live development version: https://wildfire-meteo-9975c490.fastapicloud.dev/
+Live development version: https://wildfire-meteo-35f3381e.fastapicloud.dev/
 
 ## Local install
 
