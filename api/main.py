@@ -90,6 +90,7 @@ async def upload_sounding(file: UploadFile = File(...)):
         "p_hpa": (df["pressure"] / 100).tolist(),
         "T":     df["temperature"].tolist(),
         "Td":    df["Td"].tolist(),
+        "time":  df.index[0].strftime("%H:%M"),
     }
 
 

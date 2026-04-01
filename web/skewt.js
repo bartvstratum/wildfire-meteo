@@ -276,8 +276,8 @@ function draw_skewt()
         }
         if (obs_sounding)
         {
-            legend_items.push({ label: "T (obs)",  color: color_T,  dashes: "6,3" });
-            legend_items.push({ label: "Td (obs)", color: color_Td, dashes: "6,3" });
+            legend_items.push({ label: `T (obs ${obs_sounding.time})`,  color: color_T,  dashes: "6,3" });
+            legend_items.push({ label: `Td (obs ${obs_sounding.time})`, color: color_Td, dashes: "6,3" });
         }
         if (model_sounding && document.getElementById("launch_parcel").checked)
             legend_items.push({ label: "Parcel", color: "#000", dashes: "6,3" });
@@ -330,17 +330,20 @@ function draw_skewt()
 
     if (model_forecast)
     {
-        const lat   = document.getElementById("lat_input").value;
-        const lon   = document.getElementById("lon_input").value;
-        const date  = document.getElementById("date_input").value;
+        const lat = document.getElementById("lat_input").value;
+        const lon = document.getElementById("lon_input").value;
+        const date = document.getElementById("date_input").value;
         const model = document.getElementById("model_select").selectedOptions[0].text;
-        const time  = model_forecast.times[current_time];
+        const time = model_forecast.times[current_time];
+        const selected_case = document.getElementById("case_select").value;
+        const case_prefix = (obs_sounding && selected_case) ? document.getElementById("case_select").selectedOptions[0].text + "  |  " : "";
+
         g.append("text")
             .attr("x", W / 2).attr("y", -10)
             .attr("text-anchor", "middle")
             .style("font-size", font_size)
             .style("fill", "#444")
-            .text(`${lat}°N, ${lon}°E  |  ${date} ${time} UTC  |  model=${model}`);
+            .text(`${case_prefix}${lat}°N, ${lon}°E  |  ${date} ${time} UTC  |  model: ${model}`);
     }
 }
 
@@ -356,7 +359,7 @@ document.getElementById("sounding_upload").addEventListener("change", (e) =>
         .then(r => { if (!r.ok) return r.json().then(e => { throw new Error(e.detail); }); return r.json(); })
         .then(data =>
         {
-            obs_sounding = { p_hpa: data.p_hpa, T: data.T, Td: data.Td };
+            obs_sounding = { p_hpa: data.p_hpa, T: data.T, Td: data.Td, time: data.time };
             draw_skewt();
         })
         .catch(err => alert("Upload failed: " + err.message));
