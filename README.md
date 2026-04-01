@@ -8,7 +8,7 @@ Live development version: https://wildfire-meteo-9975c490.fastapicloud.dev/
 
 New:
 - Install package locally with `pip install -e .`
-- Start server with `fastapi dev`
+- Start server locally, run `fastapi dev`
 
 To deploy to FastAPI cloud:
 - `fastapi login`
