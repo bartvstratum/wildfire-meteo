@@ -23,6 +23,7 @@ const margin = { top: 30, right: 30, bottom: 65, left: 70 };
 
 let bg_data = null;
 let model_sounding = null;
+let obs_sounding = null;
 let model_forecast = null;
 let current_time = 0;
 
@@ -246,14 +247,41 @@ function draw_skewt()
         draw_skewt_profile(td_pts, color_Td, model_sounding.Td);
 
         redraw_parcel();
+    }
 
-        const legend_items = [
-            { label: "T (model)",  color: color_T  },
-            { label: "Td (model)", color: color_Td },
-        ];
+    if (obs_sounding)
+    {
+        const line = d3.line().x(d => x(d[0])).y(d => y(d[1]));
 
-        if (document.getElementById("launch_parcel").checked)
+        const t_pts  = obs_sounding.T.map( (t, i) => [skew_transform(t,  obs_sounding.p_hpa[i]), obs_sounding.p_hpa[i]]);
+        const td_pts = obs_sounding.Td.map((t, i) => [skew_transform(t, obs_sounding.p_hpa[i]), obs_sounding.p_hpa[i]]);
+
+        chart.append("path").datum(t_pts)
+            .attr("fill", "none").attr("stroke", color_T)
+            .attr("stroke-width", 2.5).attr("stroke-dasharray", "6,3").attr("d", line);
+
+        chart.append("path").datum(td_pts)
+            .attr("fill", "none").attr("stroke", color_Td)
+            .attr("stroke-width", 2.5).attr("stroke-dasharray", "6,3").attr("d", line);
+    }
+
+    if (model_sounding || obs_sounding)
+    {
+        const legend_items = [];
+
+        if (model_sounding)
+        {
+            legend_items.push({ label: "T (model)",  color: color_T  });
+            legend_items.push({ label: "Td (model)", color: color_Td });
+        }
+        if (obs_sounding)
+        {
+            legend_items.push({ label: "T (obs)",  color: color_T,  dashes: "6,3" });
+            legend_items.push({ label: "Td (obs)", color: color_Td, dashes: "6,3" });
+        }
+        if (model_sounding && document.getElementById("launch_parcel").checked)
             legend_items.push({ label: "Parcel", color: "#000", dashes: "6,3" });
+
         const line_len = 22;
         const row_h    = 22;
 
@@ -315,6 +343,24 @@ function draw_skewt()
             .text(`${lat}°N, ${lon}°E  |  ${date} ${time} UTC  |  model=${model}`);
     }
 }
+
+document.getElementById("sounding_upload").addEventListener("change", (e) =>
+{
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const form_data = new FormData();
+    form_data.append("file", file);
+
+    fetch("/api/upload_sounding", { method: "POST", body: form_data })
+        .then(r => { if (!r.ok) return r.json().then(e => { throw new Error(e.detail); }); return r.json(); })
+        .then(data =>
+        {
+            obs_sounding = { p_hpa: data.p_hpa, T: data.T, Td: data.Td };
+            draw_skewt();
+        })
+        .catch(err => alert("Upload failed: " + err.message));
+});
 
 document.getElementById("download_btn").addEventListener("click", () =>
 {

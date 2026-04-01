@@ -17,12 +17,15 @@
 
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query
+import io
+
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.staticfiles import StaticFiles
 
 import pandas as pd
 from .skewT import get_static_lines
 from .open_meteo import get_model_sounding
+from .soundings import read_wfdp_sounding
 
 app = FastAPI()
 
@@ -72,6 +75,21 @@ def model_sounding(
         "ql":     ds["ql"].values.tolist(),
         "theta":  ds["theta"].values.tolist(),
         "thetav": ds["thetav"].values.tolist(),
+    }
+
+
+@app.post("/api/upload_sounding")
+async def upload_sounding(file: UploadFile = File(...)):
+    contents = await file.read()
+    try:
+        df = read_wfdp_sounding(io.StringIO(contents.decode()))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid sounding format.")
+
+    return {
+        "p_hpa": (df["pressure"] / 100).tolist(),
+        "T":     df["temperature"].tolist(),
+        "Td":    df["Td"].tolist(),
     }
 
 
