@@ -104,6 +104,7 @@ document.getElementById("time_slider").addEventListener("input", (e) =>
 
 document.getElementById("launch_parcel").addEventListener("change", draw_skewt);
 document.getElementById("parcel_mode").addEventListener("change", draw_skewt);
+document.getElementById("show_background").addEventListener("change", draw_skewt);
 
 function draw_skewt_lines(chart, x, y, temps, pressures_pa, color)
 {
@@ -149,7 +150,7 @@ function draw_skewt()
 
     const chart = g.append("g").attr("clip-path", "url(#skewt-clip)");
 
-    if (bg_data)
+    if (bg_data && document.getElementById("show_background").checked)
     {
         draw_skewt_lines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
         draw_skewt_lines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");

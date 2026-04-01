@@ -84,11 +84,7 @@
                         <div class="spinner"></div>
                     </div>
                 </section>
-                <div class="plot-toolbar">
-                    <button id="download_btn" title="Save as PNG">
-                        <span class="material-icons">download</span> Save PNG
-                    </button>
-                </div>
+                <div class="plot-toolbar"></div>
             </div>
 
             <aside class="sidebar right">
@@ -141,6 +137,19 @@
                             Sounding file
                             <input type="file" id="sounding_upload" accept=".csv">
                         </label>
+                    </div>
+                </details>
+
+                <details class="section">
+                    <summary><span class="material-icons">image</span> Plot</summary>
+                    <div class="section-body">
+                        <label>
+                            Background lines
+                            <input type="checkbox" id="show_background" checked>
+                        </label>
+                        <button id="download_btn" title="Save as PNG">
+                            <span class="material-icons">download</span> Save PNG
+                        </button>
                     </div>
                 </details>
 
