@@ -104,7 +104,10 @@ document.getElementById("time_slider").addEventListener("input", (e) =>
 
 document.getElementById("launch_parcel").addEventListener("change", draw_skewt);
 document.getElementById("parcel_mode").addEventListener("change", draw_skewt);
-document.getElementById("show_background").addEventListener("change", draw_skewt);
+document.getElementById("show_isotherms").addEventListener("change", draw_skewt);
+document.getElementById("show_isohumes").addEventListener("change", draw_skewt);
+document.getElementById("show_dry_adiabats").addEventListener("change", draw_skewt);
+document.getElementById("show_moist_adiabats").addEventListener("change", draw_skewt);
 
 function draw_skewt_lines(chart, x, y, temps, pressures_pa, color)
 {
@@ -150,12 +153,16 @@ function draw_skewt()
 
     const chart = g.append("g").attr("clip-path", "url(#skewt-clip)");
 
-    if (bg_data && document.getElementById("show_background").checked)
+    if (bg_data)
     {
-        draw_skewt_lines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
-        draw_skewt_lines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");
-        draw_skewt_lines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
-        draw_skewt_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
+        if (document.getElementById("show_isotherms").checked)
+            draw_skewt_lines(chart, x, y, bg_data.isotherms,      bg_data.p_isotherms, "rgba(179,179,179,0.7)");
+        if (document.getElementById("show_isohumes").checked)
+            draw_skewt_lines(chart, x, y, bg_data.isohumes,       bg_data.p_isohumes,  "rgba(31,119,180,0.7)");
+        if (document.getElementById("show_dry_adiabats").checked)
+            draw_skewt_lines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
+        if (document.getElementById("show_moist_adiabats").checked)
+            draw_skewt_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
     }
 
     if (model_sounding)
