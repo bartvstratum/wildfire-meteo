@@ -162,7 +162,7 @@ function draw_skewt()
         if (document.getElementById("show_dry_adiabats").checked)
             draw_skewt_lines(chart, x, y, bg_data.dry_adiabats,   bg_data.p_dry,       "rgba(214,39,40,0.7)");
         if (document.getElementById("show_moist_adiabats").checked)
-            draw_skewt_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(179,179,179,0.7)");
+            draw_skewt_lines(chart, x, y, bg_data.moist_adiabats, bg_data.p_moist,     "rgba(13,145,70,0.7)");
     }
 
     if (model_sounding)
